@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --navy: #110F49;
+  --navy-light: #1E1B6B;
+  --navy-dark: #0A0833;
+  --green: #2E7D32;
+  --green-bright: #43a047;
+  --green-light: #e8f5e9;
+  --red: #c62828;
+  --red-bright: #e53935;
+  --red-light: #ffebee;
+  --blue: #110F49;
+  --blue-bright: #1E1B6B;
+  --blue-light: #EEEDF7;
+  --orange: #ef6c00;
+  --orange-light: #fff3e0;
+  --gold: #f9a825;
+  --gold-dark: #f57f17;
+  --gray: #546e7a;
+  --gray-light: #f5f7fa;
+  --border: #cfd8dc;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #eceff1;
+  color: #263238;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 18px;
+  margin: 0;
+}
+
+@layer utilities {
+  .btn {
+    @apply px-5 py-3 rounded-xl font-semibold text-base transition-all duration-200 cursor-pointer inline-flex items-center justify-center gap-2;
+  }
+  .btn-primary {
+    @apply bg-[var(--blue)] text-white hover:bg-[var(--blue-bright)];
+  }
+  .btn-success {
+    @apply bg-[var(--green)] text-white hover:bg-[var(--green-bright)];
+  }
+  .btn-danger {
+    @apply bg-[var(--red)] text-white hover:bg-[var(--red-bright)];
+  }
+  .btn-navy {
+    @apply bg-[var(--navy)] text-white hover:bg-[var(--navy-light)];
+  }
+  .btn-gold {
+    @apply bg-[var(--gold)] text-[var(--navy-dark)] hover:bg-[var(--gold-dark)] font-bold;
+  }
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-transparent;
+  }
+  .section-header {
+    @apply text-2xl font-bold text-[var(--navy)] mb-5 pb-3 border-b-4 border-[var(--red)];
+  }
 }

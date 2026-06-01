@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Truck Key Management System
 
-## Getting Started
+Fleet truck key checkout and return tracking dashboard. Bilingual (English/French).
 
-First, run the development server:
+## Features
+
+- **Check Out / Return Keys** - Scan employee badge + truck key to checkout, scan truck to return
+- **Active Keys** - Live view of all currently checked-out trucks with duration tracking
+- **Search** - Find by truck number, employee number, or transaction ID
+- **History** - Full transaction log with date/status filters + Excel export
+- **Daily Report** - Daily stats with hourly activity chart
+- **Weekly Report** - Weekly summary, most-used trucks, average checkout duration
+- **Bilingual** - English/French toggle
+- **Error Handling** - Can't check out a truck that's already out; clear error messages
+- **Employee ID Masking** - Only shows last 8 digits of scanned employee IDs
+
+## Quick Start
+
+### 1. Set up a PostgreSQL database
+
+Get a free database at [Neon](https://neon.tech) (recommended) or run locally.
+
+### 2. Configure environment
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
+# Edit .env and set your DATABASE_URL
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Install and run
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npx prisma migrate dev --name init
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## Deploy to Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Push to GitHub
+2. Import in [Vercel](https://vercel.com)
+3. Add `DATABASE_URL` environment variable (your Neon/Supabase PostgreSQL URL)
+4. Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Prisma generates automatically on build via the `postinstall` script.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js 16 (App Router)
+- Prisma + PostgreSQL
+- Tailwind CSS
+- Recharts (charts)
+- SheetJS (Excel export)

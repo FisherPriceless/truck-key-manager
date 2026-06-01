@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Transaction {
+  id             Int       @id @default(autoincrement())
+  truckNumber    String
+  employeeNumber String
+  employeeName   String    @default("")
+  routeNumber    String    @default("")
+  checkOutTime   DateTime  @default(now())
+  returnTime     DateTime?
+  status         String    @default("OUT") // OUT or RETURNED
+  createdAt      DateTime  @default(now())
+
+  @@index([truckNumber])
+  @@index([employeeNumber])
+  @@index([status])
+  @@index([checkOutTime])
+}
