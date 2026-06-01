@@ -90,12 +90,12 @@ export default function Home() {
   if (!loggedIn) {
     return (
       <div className="min-h-screen bg-[#eceff1] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 w-full max-w-md mx-4">
           <div className="flex flex-col items-center mb-8">
             <div className="mb-4">
               <img src="/truck-logo.png" alt="Truck" className="h-20 w-auto" />
             </div>
-            <h1 className="text-2xl font-bold text-[var(--navy)] tracking-wide">{t(lang, "title")}</h1>
+            <h1 className="text-lg md:text-2xl font-bold text-[var(--navy)] tracking-wide text-center">{t(lang, "title")}</h1>
           </div>
           <div className="space-y-4">
             <div>
@@ -158,41 +158,43 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#eceff1]">
       {/* Header */}
-      <header className="bg-[var(--navy)] text-white px-8 py-4 flex items-center justify-between shadow-lg">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setView("dashboard")}
-            className="hover:opacity-80 transition-opacity"
-          >
-            <img src="/truck-logo.png" alt="Truck" className="h-10 w-auto" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold tracking-wide">{t(lang, "title")}</h1>
-          </div>
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="flex rounded-xl overflow-hidden border border-white/30">
+      <header className="bg-[var(--navy)] text-white px-4 md:px-8 py-3 md:py-4 shadow-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-4">
             <button
-              onClick={() => setLang("en")}
-              className={`px-4 py-2 text-base font-medium transition ${lang === "en" ? "bg-[var(--navy-light)] text-white" : "bg-white/10 text-white/70 hover:bg-white/20"}`}
+              onClick={() => setView("dashboard")}
+              className="hover:opacity-80 transition-opacity"
             >
-              English
+              <img src="/truck-logo.png" alt="Truck" className="h-8 md:h-10 w-auto" />
             </button>
+            <h1 className="text-sm md:text-2xl font-bold tracking-wide">{t(lang, "title")}</h1>
+          </div>
+          <div className="flex items-center gap-2 md:gap-6">
+            <div className="flex rounded-xl overflow-hidden border border-white/30">
+              <button
+                onClick={() => setLang("en")}
+                className={`px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base font-medium transition ${lang === "en" ? "bg-[var(--navy-light)] text-white" : "bg-white/10 text-white/70 hover:bg-white/20"}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLang("fr")}
+                className={`px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-base font-medium transition ${lang === "fr" ? "bg-[var(--navy-light)] text-white" : "bg-white/10 text-white/70 hover:bg-white/20"}`}
+              >
+                FR
+              </button>
+            </div>
+            <div className="hidden md:block">
+              <LiveClock lang={lang} />
+            </div>
             <button
-              onClick={() => setLang("fr")}
-              className={`px-4 py-2 text-base font-medium transition ${lang === "fr" ? "bg-[var(--navy-light)] text-white" : "bg-white/10 text-white/70 hover:bg-white/20"}`}
+              onClick={() => { setLoggedIn(false); setLoginUser(""); setLoginPass(""); setView("dashboard"); }}
+              className="p-2 rounded-lg hover:bg-white/10 transition"
+              title={lang === "fr" ? "Déconnexion" : "Logout"}
             >
-              Fran&ccedil;ais
+              <FiLogOut size={20} />
             </button>
           </div>
-          <LiveClock lang={lang} />
-          <button
-            onClick={() => { setLoggedIn(false); setLoginUser(""); setLoginPass(""); setView("dashboard"); }}
-            className="p-2 rounded-lg hover:bg-white/10 transition"
-            title={lang === "fr" ? "Déconnexion" : "Logout"}
-          >
-            <FiLogOut size={22} />
-          </button>
         </div>
       </header>
 
@@ -200,7 +202,7 @@ export default function Home() {
       <div className="h-1.5 bg-[var(--red)]" />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto p-6">
+      <main className="max-w-7xl mx-auto p-3 md:p-6">
         {view === "dashboard" && <Dashboard lang={lang} setView={setView} setSearchQuery={setSearchQuery} />}
         {view === "checkout" && <CheckOutKey lang={lang} setView={setView} />}
         {view === "return" && <ReturnKey lang={lang} setView={setView} />}
@@ -257,16 +259,16 @@ function Dashboard({ lang, setView, setSearchQuery }: { lang: Lang; setView: (v:
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       {/* Left: Navigation Buttons */}
       <div className="lg:col-span-3 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3 md:gap-4">
           {navButtons.map((btn) => (
             <button
               key={btn.view}
               onClick={() => setView(btn.view)}
-              className="rounded-xl px-6 py-7 text-left text-white shadow-md hover:shadow-lg transition-all hover:brightness-110 cursor-pointer flex items-center gap-5"
+              className="rounded-xl px-3 md:px-6 py-4 md:py-7 text-left text-white shadow-md hover:shadow-lg transition-all hover:brightness-110 cursor-pointer flex items-center gap-3 md:gap-5"
               style={{ background: btn.bg }}
             >
-              <span>{btn.icon}</span>
-              <div className="font-bold text-lg tracking-wide">{btn.label}</div>
+              <span className="shrink-0">{btn.icon}</span>
+              <div className="font-bold text-sm md:text-lg tracking-wide">{btn.label}</div>
             </button>
           ))}
         </div>
@@ -405,17 +407,17 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
         <div className="space-y-6">
           {/* Step 1 */}
           <div className="card border-l-4 border-l-[var(--navy)]">
-            <div className="flex items-start gap-5">
-              <div className="w-16 h-16 rounded-full text-white flex items-center justify-center text-3xl font-bold shrink-0 shadow-md" style={{ background: "var(--navy)" }}>
+            <div className="flex items-start gap-3 md:gap-5">
+              <div className="w-10 h-10 md:w-16 md:h-16 rounded-full text-white flex items-center justify-center text-xl md:text-3xl font-bold shrink-0 shadow-md" style={{ background: "var(--navy)" }}>
                 1
               </div>
               <div className="flex-1">
-                <label className="block text-xl font-bold text-[var(--navy)] mb-3">
+                <label className="block text-base md:text-xl font-bold text-[var(--navy)] mb-2 md:mb-3">
                   {t(lang, "scanEmployeeBadge")}
                 </label>
                 <input
                   type="text"
-                  className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+                  className="w-full px-3 md:px-5 py-3 md:py-6 border-2 border-[var(--navy)] rounded-xl text-xl md:text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
                   value={employeeNumber}
                   onChange={(e) => setEmployeeNumber(e.target.value)}
                   placeholder="12345678"
@@ -432,17 +434,17 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
 
           {/* Step 2 */}
           <div className="card border-l-4 border-l-[var(--green)]">
-            <div className="flex items-start gap-5">
-              <div className="w-16 h-16 rounded-full text-white flex items-center justify-center text-3xl font-bold shrink-0 shadow-md" style={{ background: "var(--green)" }}>
+            <div className="flex items-start gap-3 md:gap-5">
+              <div className="w-10 h-10 md:w-16 md:h-16 rounded-full text-white flex items-center justify-center text-xl md:text-3xl font-bold shrink-0 shadow-md" style={{ background: "var(--green)" }}>
                 2
               </div>
               <div className="flex-1">
-                <label className="block text-xl font-bold text-[var(--navy)] mb-3">
+                <label className="block text-base md:text-xl font-bold text-[var(--navy)] mb-2 md:mb-3">
                   {t(lang, "scanTruckKey")}
                 </label>
                 <input
                   type="text"
-                  className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+                  className="w-full px-3 md:px-5 py-3 md:py-6 border-2 border-[var(--navy)] rounded-xl text-xl md:text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
                   value={truckNumber}
                   onChange={(e) => setTruckNumber(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleCheckout()}
@@ -456,7 +458,7 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
           <button
             onClick={handleCheckout}
             disabled={loading || !employeeNumber.trim() || !truckNumber.trim()}
-            className="btn w-full py-5 text-xl text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            className="btn w-full py-4 md:py-5 text-lg md:text-xl text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
             style={{ background: "var(--navy)" }}
           >
             {loading ? "..." : <><FiKey size={24} /> {t(lang, "checkOut")}</>}
@@ -511,15 +513,13 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
       </div>
 
       {/* Bottom Buttons */}
-      <div className="flex justify-between mt-8">
-        <div className="flex gap-3">
-          <button onClick={() => setView("dashboard")} className="btn btn-navy px-8 py-4 text-lg">
-            <FiHome size={20} /> {t(lang, "backToDashboard")}
-          </button>
-          <button onClick={handleClear} className="btn btn-navy px-8 py-4 text-lg">
-            {t(lang, "clear")}
-          </button>
-        </div>
+      <div className="flex flex-wrap gap-3 mt-6 md:mt-8">
+        <button onClick={() => setView("dashboard")} className="btn btn-navy px-5 md:px-8 py-3 md:py-4 text-base md:text-lg">
+          <FiHome size={20} /> {t(lang, "backToDashboard")}
+        </button>
+        <button onClick={handleClear} className="btn btn-navy px-5 md:px-8 py-3 md:py-4 text-base md:text-lg">
+          {t(lang, "clear")}
+        </button>
       </div>
     </div>
   );
@@ -576,12 +576,12 @@ function ReturnKey({ lang, setView }: { lang: Lang; setView: (v: View) => void }
         {/* Left: Scan Input + Success/Error */}
         <div className="space-y-6">
           <div className="card border-l-4 border-l-[var(--green)]">
-            <label className="block text-xl font-bold text-[var(--navy)] mb-3">
+            <label className="block text-base md:text-xl font-bold text-[var(--navy)] mb-2 md:mb-3">
               {t(lang, "scanTruckToReturn")}
             </label>
             <input
               type="text"
-              className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+              className="w-full px-3 md:px-5 py-3 md:py-6 border-2 border-[var(--navy)] rounded-xl text-xl md:text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
               value={truckNumber}
               onChange={(e) => setTruckNumber(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleReturn()}
@@ -591,7 +591,7 @@ function ReturnKey({ lang, setView }: { lang: Lang; setView: (v: View) => void }
             <button
               onClick={handleReturn}
               disabled={loading || !truckNumber.trim()}
-              className="btn w-full py-5 text-xl text-white mt-5 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+              className="btn w-full py-4 md:py-5 text-lg md:text-xl text-white mt-4 md:mt-5 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
               style={{ background: "var(--green)" }}
             >
               {loading ? "..." : <><FiCornerDownLeft size={24} /> {t(lang, "returnKeyBtn")}</>}
@@ -665,15 +665,13 @@ function ReturnKey({ lang, setView }: { lang: Lang; setView: (v: View) => void }
       </div>
 
       {/* Bottom Buttons */}
-      <div className="flex justify-between mt-8">
-        <div className="flex gap-3">
-          <button onClick={() => setView("dashboard")} className="btn btn-navy px-8 py-4 text-lg">
-            <FiHome size={20} /> {t(lang, "backToDashboard")}
-          </button>
-          <button onClick={handleClear} className="btn btn-navy px-8 py-4 text-lg">
-            {t(lang, "clear")}
-          </button>
-        </div>
+      <div className="flex flex-wrap gap-3 mt-6 md:mt-8">
+        <button onClick={() => setView("dashboard")} className="btn btn-navy px-5 md:px-8 py-3 md:py-4 text-base md:text-lg">
+          <FiHome size={20} /> {t(lang, "backToDashboard")}
+        </button>
+        <button onClick={handleClear} className="btn btn-navy px-5 md:px-8 py-3 md:py-4 text-base md:text-lg">
+          {t(lang, "clear")}
+        </button>
       </div>
     </div>
   );
@@ -803,8 +801,8 @@ function SearchTruck({ lang, setView, initialQuery, onQueryConsumed }: { lang: L
       {/* Search Controls - two column */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
         {/* Left: Search By */}
-        <div className="border border-gray-300 rounded-lg p-5">
-          <h3 className="text-sm font-bold text-[var(--navy)] uppercase tracking-wide mb-4">{t(lang, "searchBy")}</h3>
+        <div className="border border-gray-300 rounded-lg p-4 md:p-5">
+          <h3 className="text-sm font-bold text-[var(--navy)] uppercase tracking-wide mb-3 md:mb-4">{t(lang, "searchBy")}</h3>
           <div className="space-y-3">
             {searchTypeOptions.map((opt) => (
               <label key={opt.value} className="flex items-center gap-3 cursor-pointer text-base">
@@ -824,18 +822,18 @@ function SearchTruck({ lang, setView, initialQuery, onQueryConsumed }: { lang: L
         </div>
 
         {/* Right: Enter Value */}
-        <div className="border border-gray-300 rounded-lg p-5">
-          <h3 className="text-sm font-bold text-[var(--navy)] uppercase tracking-wide mb-4">{t(lang, "enterValue")}</h3>
-          <div className="flex gap-3">
+        <div className="border border-gray-300 rounded-lg p-4 md:p-5">
+          <h3 className="text-sm font-bold text-[var(--navy)] uppercase tracking-wide mb-3 md:mb-4">{t(lang, "enterValue")}</h3>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <input
               type="text"
-              className="flex-1 px-4 py-3.5 border-2 border-gray-300 rounded-lg text-xl focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+              className="flex-1 px-3 md:px-4 py-3 md:py-3.5 border-2 border-gray-300 rounded-lg text-lg md:text-xl focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               autoFocus
             />
-            <button onClick={() => handleSearch()} className="btn btn-navy px-6 text-base flex items-center gap-2">
+            <button onClick={() => handleSearch()} className="btn btn-navy px-4 md:px-6 text-base flex items-center justify-center gap-2">
               <FiSearch size={20} /> {t(lang, "searchBtn")}
             </button>
           </div>
@@ -1111,15 +1109,15 @@ function History({ lang, setView }: { lang: Lang; setView: (v: View) => void }) 
       )}
 
       {/* Bottom buttons */}
-      <div className="flex justify-between mt-6">
-        <button onClick={exportToExcel} className="btn btn-navy flex items-center gap-2">
-          <FiDownload size={20} /> {t(lang, "exportExcel")}
+      <div className="flex flex-wrap gap-2 md:gap-3 mt-6">
+        <button onClick={exportToExcel} className="btn btn-navy flex items-center gap-2 text-sm md:text-base">
+          <FiDownload size={18} /> {t(lang, "exportExcel")}
         </button>
-        <button onClick={() => setShowFilters(!showFilters)} className="btn btn-navy flex items-center gap-2">
-          <FiFilter size={20} /> {t(lang, "filter")}
+        <button onClick={() => setShowFilters(!showFilters)} className="btn btn-navy flex items-center gap-2 text-sm md:text-base">
+          <FiFilter size={18} /> {t(lang, "filter")}
         </button>
-        <button onClick={() => setView("dashboard")} className="btn btn-navy flex items-center gap-2">
-          <FiHome size={20} /> {t(lang, "backToDashboard")}
+        <button onClick={() => setView("dashboard")} className="btn btn-navy flex items-center gap-2 text-sm md:text-base">
+          <FiHome size={18} /> {t(lang, "backToDashboard")}
         </button>
       </div>
     </div>
