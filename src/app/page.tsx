@@ -19,7 +19,7 @@ import * as XLSX from "xlsx";
 import {
   FiKey, FiCornerDownLeft, FiSearch, FiLock, FiClock, FiBarChart2,
   FiHome, FiUser, FiCheckCircle, FiXCircle, FiDownload, FiRefreshCw,
-  FiFilter, FiChevronLeft, FiChevronRight, FiFileText,
+  FiFilter, FiChevronLeft, FiChevronRight, FiFileText, FiLogOut,
 } from "react-icons/fi";
 
 type View =
@@ -36,7 +36,6 @@ interface Transaction {
   id: number;
   truckNumber: string;
   employeeNumber: string;
-  employeeName: string;
   routeNumber: string;
   checkOutTime: string;
   returnTime: string | null;
@@ -51,19 +50,20 @@ interface Stats {
 }
 
 // ─── LIVE CLOCK ─────────────────────────────────────────────────────
-function LiveClock() {
+function LiveClock({ lang }: { lang: Lang }) {
   const [now, setNow] = useState(new Date());
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+  const dateLocale = lang === "fr" ? "fr-CA" : "en-CA";
   return (
     <div className="text-right">
       <div className="text-3xl font-bold font-mono tracking-wider">
         {now.toLocaleTimeString("en-CA", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}
       </div>
       <div className="text-sm opacity-80">
-        {now.toLocaleDateString("en-CA", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+        {now.toLocaleDateString(dateLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
       </div>
     </div>
   );
@@ -72,6 +72,88 @@ function LiveClock() {
 export default function Home() {
   const [view, setView] = useState<View>("dashboard");
   const [lang, setLang] = useState<Lang>("en");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [loginUser, setLoginUser] = useState("");
+  const [loginPass, setLoginPass] = useState("");
+  const [loginError, setLoginError] = useState(false);
+
+  function handleLogin() {
+    if (loginUser === "admin" && loginPass === "admin") {
+      setLoggedIn(true);
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+    }
+  }
+
+  if (!loggedIn) {
+    return (
+      <div className="min-h-screen bg-[#eceff1] flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md">
+          <div className="flex flex-col items-center mb-8">
+            <div className="mb-4">
+              <img src="/truck-logo.png" alt="Truck" className="h-20 w-auto" />
+            </div>
+            <h1 className="text-2xl font-bold text-[var(--navy)] tracking-wide">{t(lang, "title")}</h1>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-[var(--navy)] mb-1">{lang === "fr" ? "Utilisateur" : "Username"}</label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-lg focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+                value={loginUser}
+                onChange={(e) => { setLoginUser(e.target.value); setLoginError(false); }}
+                placeholder={lang === "fr" ? "Utilisateur" : "Username"}
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-[var(--navy)] mb-1">{lang === "fr" ? "Mot de passe" : "Password"}</label>
+              <input
+                type="password"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-lg focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+                value={loginPass}
+                onChange={(e) => { setLoginPass(e.target.value); setLoginError(false); }}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                placeholder="********"
+              />
+            </div>
+            {loginError && (
+              <div className="text-[var(--red)] text-sm font-semibold text-center">
+                {lang === "fr" ? "Identifiants invalides" : "Invalid credentials"}
+              </div>
+            )}
+            <button
+              onClick={handleLogin}
+              className="w-full py-3.5 rounded-xl text-white text-lg font-bold shadow-md hover:opacity-90 transition"
+              style={{ background: "var(--navy)" }}
+            >
+              <FiLock className="inline mr-2" size={20} />
+              {lang === "fr" ? "Connexion" : "Login"}
+            </button>
+          </div>
+          <div className="flex justify-center mt-6">
+            <div className="flex rounded-xl overflow-hidden border border-gray-300">
+              <button
+                onClick={() => setLang("en")}
+                className={`px-4 py-2 text-sm font-medium transition ${lang === "en" ? "bg-[var(--navy)] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+              >
+                English
+              </button>
+              <button
+                onClick={() => setLang("fr")}
+                className={`px-4 py-2 text-sm font-medium transition ${lang === "fr" ? "bg-[var(--navy)] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+              >
+                Fran&ccedil;ais
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#eceff1]">
@@ -80,9 +162,9 @@ export default function Home() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setView("dashboard")}
-            className="text-[var(--red-bright)] hover:text-[var(--red)] transition-colors"
+            className="hover:opacity-80 transition-opacity"
           >
-            <FiKey size={36} />
+            <img src="/truck-logo.png" alt="Truck" className="h-10 w-auto" />
           </button>
           <div>
             <h1 className="text-2xl font-bold tracking-wide">{t(lang, "title")}</h1>
@@ -103,7 +185,14 @@ export default function Home() {
               Fran&ccedil;ais
             </button>
           </div>
-          <LiveClock />
+          <LiveClock lang={lang} />
+          <button
+            onClick={() => { setLoggedIn(false); setLoginUser(""); setLoginPass(""); setView("dashboard"); }}
+            className="p-2 rounded-lg hover:bg-white/10 transition"
+            title={lang === "fr" ? "Déconnexion" : "Logout"}
+          >
+            <FiLogOut size={22} />
+          </button>
         </div>
       </header>
 
@@ -112,22 +201,21 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto p-6">
-        {view === "dashboard" && <Dashboard lang={lang} setView={setView} />}
+        {view === "dashboard" && <Dashboard lang={lang} setView={setView} setSearchQuery={setSearchQuery} />}
         {view === "checkout" && <CheckOutKey lang={lang} setView={setView} />}
         {view === "return" && <ReturnKey lang={lang} setView={setView} />}
         {view === "active" && <ActiveKeys lang={lang} setView={setView} />}
-        {view === "search" && <SearchTruck lang={lang} setView={setView} />}
+        {view === "search" && <SearchTruck lang={lang} setView={setView} initialQuery={searchQuery} onQueryConsumed={() => setSearchQuery("")} />}
         {view === "history" && <History lang={lang} setView={setView} />}
         {view === "daily" && <DailyReport lang={lang} setView={setView} />}
         {view === "weekly" && <WeeklyReport lang={lang} setView={setView} />}
-
       </main>
     </div>
   );
 }
 
 // ─── DASHBOARD ──────────────────────────────────────────────────────
-function Dashboard({ lang, setView }: { lang: Lang; setView: (v: View) => void }) {
+function Dashboard({ lang, setView, setSearchQuery }: { lang: Lang; setView: (v: View) => void; setSearchQuery: (q: string) => void }) {
   const [stats, setStats] = useState<Stats>({ activeKeys: 0, freeTrucks: 0, totalTrucks: 0, totalTransactions: 0 });
   const [quickSearch, setQuickSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Transaction[]>([]);
@@ -227,7 +315,7 @@ function Dashboard({ lang, setView }: { lang: Lang; setView: (v: View) => void }
           <div className="flex gap-3">
             <input
               type="text"
-              className="flex-1 px-4 py-3.5 border-2 border-gray-300 rounded-xl text-base font-mono focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+              className="flex-1 px-4 py-3.5 border-2 border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
               placeholder={t(lang, "quickSearch")}
               value={quickSearch}
               onChange={(e) => handleQuickSearch(e.target.value)}
@@ -244,7 +332,7 @@ function Dashboard({ lang, setView }: { lang: Lang; setView: (v: View) => void }
                 <div
                   key={tx.id}
                   className="px-4 py-3 hover:bg-[var(--blue-light)] border-b last:border-b-0 cursor-pointer"
-                  onClick={() => { setShowResults(false); setView("search"); }}
+                  onClick={() => { setShowResults(false); setSearchQuery(tx.truckNumber); setView("search"); }}
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-mono font-bold text-[var(--navy)]">{t(lang, "truckNumber")}: {tx.truckNumber}</span>
@@ -270,9 +358,7 @@ function Dashboard({ lang, setView }: { lang: Lang; setView: (v: View) => void }
 // ─── CHECK OUT KEY ──────────────────────────────────────────────────
 function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void }) {
   const [employeeNumber, setEmployeeNumber] = useState("");
-  const [employeeName, setEmployeeName] = useState("");
   const [truckNumber, setTruckNumber] = useState("");
-  const [routeNumber, setRouteNumber] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string; data?: Transaction } | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -284,7 +370,7 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ truckNumber, employeeNumber, employeeName, routeNumber }),
+      body: JSON.stringify({ truckNumber, employeeNumber }),
     });
 
     const data = await res.json();
@@ -304,9 +390,7 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
 
   function handleClear() {
     setEmployeeNumber("");
-    setEmployeeName("");
     setTruckNumber("");
-    setRouteNumber("");
     setMessage(null);
   }
 
@@ -331,7 +415,7 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
                 </label>
                 <input
                   type="text"
-                  className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl font-mono focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+                  className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
                   value={employeeNumber}
                   onChange={(e) => setEmployeeNumber(e.target.value)}
                   placeholder="12345678"
@@ -342,26 +426,6 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
                     Showing: {maskEmployeeId(employeeNumber)}
                   </div>
                 )}
-                <div className="mt-4">
-                  <label className="block text-sm font-semibold text-[var(--gray)] mb-1 uppercase">{t(lang, "employeeName")}</label>
-                  <input
-                    type="text"
-                    className="input"
-                    value={employeeName}
-                    onChange={(e) => setEmployeeName(e.target.value)}
-                    placeholder="John Smith"
-                  />
-                </div>
-                <div className="mt-3">
-                  <label className="block text-sm font-semibold text-[var(--gray)] mb-1 uppercase">{t(lang, "routeNumber")}</label>
-                  <input
-                    type="text"
-                    className="input"
-                    value={routeNumber}
-                    onChange={(e) => setRouteNumber(e.target.value)}
-                    placeholder="R-101"
-                  />
-                </div>
               </div>
             </div>
           </div>
@@ -378,7 +442,7 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
                 </label>
                 <input
                   type="text"
-                  className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl font-mono focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+                  className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
                   value={truckNumber}
                   onChange={(e) => setTruckNumber(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleCheckout()}
@@ -416,12 +480,8 @@ function CheckOutKey({ lang, setView }: { lang: Lang; setView: (v: View) => void
                 <span className="font-mono font-bold text-xl text-[var(--navy)]">{employeeNumber ? maskEmployeeId(employeeNumber) : "\u2014"}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-base text-gray-600">{t(lang, "name")}</span>
-                <span className="font-bold text-lg">{employeeName || "\u2014"}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-base text-gray-600">{t(lang, "routeNumber")}</span>
-                <span className="font-bold text-lg">{routeNumber || "\u2014"}</span>
+                <span className="font-mono font-bold text-xl text-[var(--navy)]">{message?.data?.routeNumber || "\u2014"}</span>
               </div>
               {message?.data && (
                 <div className="flex justify-between items-center py-2">
@@ -521,7 +581,7 @@ function ReturnKey({ lang, setView }: { lang: Lang; setView: (v: View) => void }
             </label>
             <input
               type="text"
-              className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl font-mono focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+              className="w-full px-5 py-6 border-2 border-[var(--navy)] rounded-xl text-3xl focus:outline-none focus:ring-3 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
               value={truckNumber}
               onChange={(e) => setTruckNumber(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleReturn()}
@@ -578,10 +638,6 @@ function ReturnKey({ lang, setView }: { lang: Lang; setView: (v: View) => void }
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-base text-gray-600">{t(lang, "employeeNumber")}</span>
                 <span className="font-mono font-bold text-xl text-[var(--navy)]">{maskEmployeeId(returnedTx.employeeNumber)}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-base text-gray-600">{t(lang, "name")}</span>
-                <span className="font-bold text-lg">{returnedTx.employeeName || "\u2014"}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-base text-gray-600">{t(lang, "checkOutTime")}</span>
@@ -668,7 +724,6 @@ function ActiveKeys({ lang, setView }: { lang: Lang; setView: (v: View) => void 
               <tr style={{ background: "var(--navy)" }} className="text-white">
                 <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "truckNumber")}</th>
                 <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "employeeNumber")}</th>
-                <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "name")}</th>
                 <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "checkOutTime")}</th>
                 <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "duration")}</th>
                 <th className="px-4 py-3.5 text-center font-semibold">{t(lang, "status")}</th>
@@ -681,7 +736,6 @@ function ActiveKeys({ lang, setView }: { lang: Lang; setView: (v: View) => void 
                   <tr key={tx.id} className={`border-b border-gray-200 ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
                     <td className="px-4 py-3.5 font-mono font-bold">{tx.truckNumber}</td>
                     <td className="px-4 py-3.5 font-mono">{maskEmployeeId(tx.employeeNumber)}</td>
-                    <td className="px-4 py-3.5">{tx.employeeName || "\u2014"}</td>
                     <td className="px-4 py-3.5">{formatDateTime(tx.checkOutTime)}</td>
                     <td className="px-4 py-3.5">{formatDuration(durationMs)}</td>
                     <td className="px-4 py-3.5 text-center">
@@ -711,9 +765,9 @@ function ActiveKeys({ lang, setView }: { lang: Lang; setView: (v: View) => void 
 }
 
 // ─── SEARCH ─────────────────────────────────────────────────────────
-function SearchTruck({ lang, setView }: { lang: Lang; setView: (v: View) => void }) {
+function SearchTruck({ lang, setView, initialQuery, onQueryConsumed }: { lang: Lang; setView: (v: View) => void; initialQuery?: string; onQueryConsumed?: () => void }) {
   const [searchType, setSearchType] = useState<"truck" | "employee" | "transaction">("truck");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery || "");
   const [results, setResults] = useState<Transaction[]>([]);
   const [searched, setSearched] = useState(false);
 
@@ -721,13 +775,22 @@ function SearchTruck({ lang, setView }: { lang: Lang; setView: (v: View) => void
   const currentOut = results.find((tx) => tx.status === "OUT");
   const lastReturn = results.find((tx) => tx.status === "RETURNED");
 
-  async function handleSearch() {
-    if (!query.trim()) return;
-    const res = await fetch(`/api/search?type=${searchType}&q=${encodeURIComponent(query)}`);
+  async function handleSearch(q?: string) {
+    const searchVal = q || query;
+    if (!searchVal.trim()) return;
+    const res = await fetch(`/api/search?type=${searchType}&q=${encodeURIComponent(searchVal)}`);
     const data = await res.json();
     setResults(data);
     setSearched(true);
   }
+
+  useEffect(() => {
+    if (initialQuery) {
+      handleSearch(initialQuery);
+      onQueryConsumed?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const searchTypeOptions: { value: "truck" | "employee" | "transaction"; labelKey: "truckNumberLabel" | "employeeNumberLabel" | "transactionId" }[] = [
     { value: "truck", labelKey: "truckNumberLabel" },
@@ -766,7 +829,7 @@ function SearchTruck({ lang, setView }: { lang: Lang; setView: (v: View) => void
           <div className="flex gap-3">
             <input
               type="text"
-              className="flex-1 px-4 py-3.5 border-2 border-gray-300 rounded-lg text-xl font-mono focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+              className="flex-1 px-4 py-3.5 border-2 border-gray-300 rounded-lg text-xl focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -802,7 +865,7 @@ function SearchTruck({ lang, setView }: { lang: Lang; setView: (v: View) => void
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--gray)] font-semibold">{t(lang, "currentEmployee")}:</span>
-                      <span>{maskEmployeeId(currentOut.employeeNumber)} ({currentOut.employeeName || "\u2014"})</span>
+                      <span>{maskEmployeeId(currentOut.employeeNumber)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--gray)] font-semibold">{t(lang, "checkOutTime")}:</span>
@@ -838,7 +901,7 @@ function SearchTruck({ lang, setView }: { lang: Lang; setView: (v: View) => void
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--gray)] font-semibold">{t(lang, "employeeNumber")}:</span>
-                      <span>{maskEmployeeId(lastReturn.employeeNumber)} ({lastReturn.employeeName || "\u2014"})</span>
+                      <span>{maskEmployeeId(lastReturn.employeeNumber)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--gray)] font-semibold">{t(lang, "duration")}:</span>
@@ -915,8 +978,7 @@ function History({ lang, setView }: { lang: Lang; setView: (v: View) => void }) 
       ID: tx.id,
       [t(lang, "truckNumber")]: tx.truckNumber,
       [t(lang, "employeeNumber")]: maskEmployeeId(tx.employeeNumber),
-      [t(lang, "name")]: tx.employeeName,
-      [t(lang, "routeNumber")]: tx.routeNumber,
+      [t(lang, "routeNumber")]: tx.routeNumber || "",
       [t(lang, "checkOutTime")]: formatDateTime(tx.checkOutTime),
       [t(lang, "returnTime")]: tx.returnTime ? formatDateTime(tx.returnTime) : "",
       [t(lang, "duration")]: tx.returnTime
@@ -988,7 +1050,6 @@ function History({ lang, setView }: { lang: Lang; setView: (v: View) => void }) 
                   <th className="px-4 py-3.5 text-left font-semibold">ID</th>
                   <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "truckNumber")}</th>
                   <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "employeeNumber")}</th>
-                  <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "name")}</th>
                   <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "checkOutTime")}</th>
                   <th className="px-4 py-3.5 text-left font-semibold">{t(lang, "returnTime")}</th>
                   <th className="px-4 py-3.5 text-center font-semibold">{t(lang, "status")}</th>
@@ -1007,7 +1068,6 @@ function History({ lang, setView }: { lang: Lang; setView: (v: View) => void }) 
                       <td className="px-4 py-3.5 font-mono text-[var(--gray)]">{tx.id}</td>
                       <td className="px-4 py-3.5 font-mono font-bold">{tx.truckNumber}</td>
                       <td className="px-4 py-3.5 font-mono">{maskEmployeeId(tx.employeeNumber)}</td>
-                      <td className="px-4 py-3.5">{tx.employeeName || "\u2014"}</td>
                       <td className="px-4 py-3.5">{formatDateTime(tx.checkOutTime)}</td>
                       <td className="px-4 py-3.5">{tx.returnTime ? formatDateTime(tx.returnTime) : "\u2014"}</td>
                       <td className="px-4 py-3.5 text-center">
@@ -1093,7 +1153,6 @@ function DailyReport({ lang, setView }: { lang: Lang; setView: (v: View) => void
     const data = report.transactions.map((tx) => ({
       [t(lang, "truckNumber")]: tx.truckNumber,
       [t(lang, "employeeNumber")]: maskEmployeeId(tx.employeeNumber),
-      [t(lang, "name")]: tx.employeeName,
       [t(lang, "checkOutTime")]: formatDateTime(tx.checkOutTime),
       [t(lang, "returnTime")]: tx.returnTime ? formatDateTime(tx.returnTime) : "",
       [t(lang, "status")]: tx.status === "OUT" ? t(lang, "out") : t(lang, "returnedStatus"),
@@ -1112,7 +1171,7 @@ function DailyReport({ lang, setView }: { lang: Lang; setView: (v: View) => void
           <label className="block text-sm font-bold text-[var(--navy)] uppercase mb-2">{t(lang, "date")}</label>
           <input
             type="date"
-            className="px-4 py-3 border-2 border-gray-300 rounded-lg text-base font-mono focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+            className="px-4 py-3 border-2 border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
             value={date}
             onChange={(e) => { setDate(e.target.value); setGenerated(false); }}
           />
@@ -1234,7 +1293,7 @@ function WeeklyReport({ lang, setView }: { lang: Lang; setView: (v: View) => voi
           <label className="block text-sm font-bold text-[var(--navy)] uppercase mb-2">{t(lang, "weekStarting")}</label>
           <input
             type="date"
-            className="px-4 py-3 border-2 border-gray-300 rounded-lg text-base font-mono focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
+            className="px-4 py-3 border-2 border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[var(--navy)] focus:border-[var(--navy)]"
             value={date}
             onChange={(e) => { setDate(e.target.value); setGenerated(false); }}
           />

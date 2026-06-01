@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { truckNumber, employeeNumber, employeeName, routeNumber } = body;
+    const { truckNumber, employeeNumber } = body;
 
     if (!employeeNumber?.trim()) {
       return NextResponse.json(
@@ -37,8 +37,8 @@ export async function POST(request: Request) {
       data: {
         truckNumber: truckNumber.trim(),
         employeeNumber: employeeNumber.trim(),
-        employeeName: employeeName?.trim() || "",
-        routeNumber: routeNumber?.trim() || "",
+        employeeName: "",
+        routeNumber: "",
       },
     });
 

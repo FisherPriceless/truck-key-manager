@@ -50,7 +50,6 @@ export async function GET(request: Request) {
         id: t.id,
         truckNumber: t.truckNumber,
         employeeNumber: t.employeeNumber,
-        employeeName: t.employeeName,
         routeNumber: t.routeNumber,
         checkOutTime: t.checkOutTime,
         returnTime: t.returnTime,
