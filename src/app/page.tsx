@@ -835,7 +835,7 @@ function SearchTruck({ lang, setView, initialQuery, onQueryConsumed }: { lang: L
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               autoFocus
             />
-            <button onClick={handleSearch} className="btn btn-navy px-6 text-base flex items-center gap-2">
+            <button onClick={() => handleSearch()} className="btn btn-navy px-6 text-base flex items-center gap-2">
               <FiSearch size={20} /> {t(lang, "searchBtn")}
             </button>
           </div>
